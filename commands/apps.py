@@ -5,6 +5,8 @@ import os
 apps = {
     "chrome": "start chrome",
 
+    "youtube": "start chrome https://www.youtube.com",
+
     "steam": r"C:\Program Files (x86)\Steam\steam.exe",
 
     "spotify": r"C:\Users\adi\AppData\Roaming\Spotify\Spotify.exe",

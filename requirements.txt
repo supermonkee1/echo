@@ -4,3 +4,6 @@ pyautogui
 pyaudio
 requests
 
+faster-whisper 
+sounddevice 
+scipy
