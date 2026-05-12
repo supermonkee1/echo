@@ -86,6 +86,16 @@ Echo/
 
 ---
 
+## New Features
+
+- Local Whisper speech recognition
+- GPU accelerated transcription
+- Wake-word activation system
+- Interruptible text-to-speech
+- Turn-based assistant architecture
+
+---
+
 # Future Plans
 
 - Local AI integration
