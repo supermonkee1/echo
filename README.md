@@ -1,73 +1,77 @@
 # Echo
 
-Echo is a Python-based desktop voice assistant for Windows.
+A modular local AI voice assistant for Windows built with Python.
 
-It can:
-- Listen for voice commands
-- Respond using text-to-speech
-- Open applications
-- Take screenshots
-- Use a wake word system
-- Continuously listen for commands
-
-## Features
-
-- Wake word: `Echo`
-- Voice recognition using SpeechRecognition
-- Text-to-speech responses using pyttsx3
-- Modular command system
-- Screenshot support
-- Generic app launcher
-- Continuous listening loop
+Echo combines local speech recognition, AI intent routing, conversational AI, and desktop automation into a fully offline-capable assistant architecture.
 
 ---
 
-# Current Commands
+# Features
+
+## Voice Interaction
+
+* Wake-word activation (`Echo`)
+* Continuous microphone listening
+* Silence-based automatic recording stop
+* Interruptible speech output
+* Voice feedback sounds
+
+## AI Systems
+
+* Local AI intent routing using Gemma
+* Conversational responses using Phi-3
+* Structured JSON action parsing
+* Natural language command understanding
+
+## Desktop Automation
+
+* Dynamic Windows app launching
+* Screenshot capture
+* Web searching
+* Sleep/shutdown mode
+
+## Architecture
+
+* Modular command system
+* Separate routing and chat models
+* Local Whisper GPU speech recognition
+* Turn-based assistant flow
+* Easily expandable command structure
+
+---
+
+# AI Stack
+
+| System              | Model / Tool   |
+| ------------------- | -------------- |
+| Speech Recognition  | Faster-Whisper |
+| Intent Routing      | Gemma 2B       |
+| Conversation        | Phi-3          |
+| Automation          | Python         |
+| Local Model Runtime | Ollama         |
+
+---
+
+# Current Capabilities
+
+Echo can currently:
+
+* Open installed Windows applications
+* Understand natural language requests
+* Search the web
+* Take screenshots
+* Hold short conversations
+* Respond to wake-word activation
+* Run fully locally on the computer
 
 Examples:
 
-- `echo open chrome`
-- `echo open steam`
-- `echo screenshot`
-- `echo sleep`
-
----
-
-# Installation
-
-## Clone the Repository
-
-```bash
-git clone https://github.com/supermonkee1/echo.git
-cd echo
-```
-
-## Create Virtual Environment
-
-```bash
-python -m venv venv
-```
-
-## Activate Virtual Environment
-
-### Windows
-
-```bash
-venv\Scripts\activate
-```
-
-## Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
----
-
-# Running Echo
-
-```bash
-python main.py
+```text
+Echo open chrome
+Echo launch steam
+Echo search for python tutorials
+Echo take a screenshot
+Echo who made minecraft
 ```
 
 ---
@@ -76,48 +80,130 @@ python main.py
 
 ```text
 Echo/
+│
 ├── commands/
+│   ├── ai_router.py
+│   ├── app_finder.py
+│   ├── chat.py
+│   ├── screenshot.py
+│   ├── search_web.py
+│   └── __init__.py
+│
+├── tests/
 ├── screenshots/
-├── venv/
 ├── main.py
+├── requirements.txt
 ├── README.md
 └── .gitignore
 ```
 
 ---
 
-## New Features
+# Installation
 
-- Local Whisper speech recognition
-- GPU accelerated transcription
-- Wake-word activation system
-- Interruptible text-to-speech
-- Turn-based assistant architecture
+## 1. Clone The Repository
+
+```powershell
+git clone https://github.com/supermonkee1/echo.git
+cd echo
+```
+
+---
+
+## 2. Create Virtual Environment
+
+```powershell
+python -m venv venv
+```
+
+Activate:
+
+```powershell
+venv\Scripts\activate
+```
+
+---
+
+## 3. Install Dependencies
+
+```powershell
+pip install -r requirements.txt
+```
+
+---
+
+## 4. Install Ollama
+
+Install Ollama from:
+
+[https://ollama.com/](https://ollama.com/)
+
+---
+
+## 5. Download AI Models
+
+```powershell
+ollama run gemma:2b
+```
+
+```powershell
+ollama run phi3
+```
+
+---
+
+# Running Echo
+
+```powershell
+python main.py
+```
+
+Say:
+
+```text
+Echo
+```
+
+to activate the assistant.
 
 ---
 
 # Future Plans
 
-- Local AI integration
-- Better wake word detection
-- Smarter command parsing
-- Memory system
-- GUI
-- Timers and reminders
-- Screen understanding
+* Better interruption system
+* Smarter memory/context
+* Dynamic tool registry
+* Improved fuzzy app matching
+* GUI interface
+* Screen understanding
+* Streaming responses
+* More desktop controls
+* Faster wake-word detection
 
 ---
 
-# Technologies Used
+# Notes
 
-- Python 3.11
-- SpeechRecognition
-- pyttsx3
-- pyautogui
-- Ollama (planned)
+Echo is currently optimized for:
+
+* Windows 11
+* NVIDIA GPU acceleration
+* Local/offline AI usage
+
+This project is still actively evolving.
 
 ---
 
-# License
 
-This project is open-source.
+# Credits
+
+Built using:
+
+* Python
+* Faster-Whisper
+* Ollama
+* Gemma
+* Phi-3
+* pyttsx3
+* sounddevice
+

@@ -147,6 +147,7 @@ def listen():
 
     return full_text.lower().strip()
 
+
 def startup_sound():
 
     winsound.Beep(800, 200)
@@ -198,11 +199,12 @@ status("online")
 speak("Hello, I'm Echo. Say 'Echo' to wake me up.")
 app_finder.scan_apps()
 
+# Main loop
 while True:
 
     try:
 
-        # LISTEN ONLY
+        # Listen for wake word
         if not wait_for_wake_word():
             continue
 
@@ -217,14 +219,14 @@ while True:
         action = result.get("action")
 
         
-        # WAKE WORD
+        # Wake word
         
 
         command = command.replace("echo", "").strip()
  
 
         
-        # OPEN APP
+        # Open app
         if action == "open_app":
             
             success_sound()
@@ -240,7 +242,7 @@ while True:
                 continue
 
         
-        # SCREENSHOT
+        # Screenshot
         elif action == "screenshot":
 
             success_sound()
@@ -253,7 +255,7 @@ while True:
                 continue
         
 
-        # SEARCH WEB
+        # Search web
         elif action == "search_web":
 
             query = result.get("query", "")
@@ -268,7 +270,7 @@ while True:
                 continue
             
 
-        # SLEEP
+        # Sleep
         elif action == "sleep":
             sleep_sound()
 
@@ -279,8 +281,8 @@ while True:
             break
 
 
-        # UNKNOWN
-                # UNKNOWN → CHAT FALLBACK
+    
+        # Unknown → Chat response
         else:
 
             response = chat.run(command)
