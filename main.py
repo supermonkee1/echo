@@ -1,16 +1,25 @@
 import speech_recognition as sr
-from commands import ai_chat
-from commands import ai_chat, screenshot
-from commands import apps
-import sounddevice as sd
-from scipy.io.wavfile import write
-from faster_whisper import WhisperModel
-
-model = WhisperModel("base", compute_type="float32")
-
+import numpy as np
+import winsound
+import time
 import threading
 import pyttsx3
 import keyboard
+import sounddevice as sd
+import requests
+import subprocess
+
+from scipy.io.wavfile import write
+from faster_whisper import WhisperModel
+model = WhisperModel("base", compute_type="float32")
+
+from commands import ai_chat, screenshot
+from commands import apps
+from commands import search_web
+from commands import ai_router
+from commands import app_finder
+from commands import chat
+
 
 wake_listener = sr.Recognizer()
 
@@ -34,7 +43,6 @@ def wait_for_wake_word():
 
     except:
         return False
-
 is_speaking = False
 
 def speak(text):
@@ -79,27 +87,50 @@ def speak(text):
 
     engine.stop()
 
-
-
-
 def status(text):
     print(f"\n[{text.upper()}]")
 
 def listen():
 
     sample_rate = 16000
-    duration = 5
+    silence_threshold = 0.01
+    silence_duration = 2.0
+
+    audio_chunks = []
+
+    silent_time = 0
 
     status("listening")
 
-    audio = sd.rec(
-        int(duration * sample_rate),
+    print("Speak now...")
+
+    with sd.InputStream(
         samplerate=sample_rate,
         channels=1
-    )
+    ) as stream:
 
-    sd.wait()
+        while True:
 
+            chunk, overflowed = stream.read(1024)
+
+            audio_chunks.append(chunk)
+
+            volume = abs(chunk).mean()
+
+            # Silence detection
+            if volume < silence_threshold:
+                silent_time += 1024 / sample_rate
+            else:
+                silent_time = 0
+
+            # Stop after enough silence
+            if silent_time >= silence_duration:
+                break
+
+    # Combine chunks
+    audio = np.concatenate(audio_chunks, axis=0)
+
+    # Save audio
     write("recording.wav", sample_rate, audio)
 
     status("transcribing")
@@ -116,6 +147,56 @@ def listen():
 
     return full_text.lower().strip()
 
+def startup_sound():
+
+    winsound.Beep(800, 200)
+
+def listening_sound():
+
+    winsound.Beep(1000, 150)
+
+def success_sound():
+
+    winsound.Beep(1200, 120)
+
+def sleep_sound():
+
+    winsound.Beep(500, 350)
+
+def interrupt_sound():
+
+    winsound.Beep(700, 200)
+
+def not_found_sound():
+
+    winsound.Beep(300, 400)
+
+def error_sound():
+
+    winsound.Beep(400, 300)
+
+
+
+    target = target.lower()
+
+    for app_name in apps:
+
+        if target in app_name:
+
+            subprocess.Popen(apps[app_name], shell=True)
+
+            return f"Opening {app_name}"
+
+    return "Application not found"
+
+
+
+
+
+startup_sound()
+status("online")
+speak("Hello, I'm Echo. Say 'Echo' to wake me up.")
+app_finder.scan_apps()
 
 while True:
 
@@ -125,64 +206,96 @@ while True:
         if not wait_for_wake_word():
             continue
 
-
+        listening_sound()
         command = listen()
+        print("\nYou said:", command)
 
-        print(f"heard: {command}")
+        status("processing")
 
+        result = ai_router.run(command)
+
+        action = result.get("action")
+
+        
         # WAKE WORD
         
 
         command = command.replace("echo", "").strip()
-
-        print("processing...")    
-
-            # SLEEP
-        if "sleep" in command:
-
-                speak("Going to sleep")
-
-                status("sleeping")
-
-                break
-
-            # SCREENSHOT
-        elif "screenshot" in command:
-
-                response = screenshot.run()
-                speak(response)
-
-                if interrupt_requested:
-                    continue
-                    
-                
-
-            # CHROME
-        elif "open" in command:
-
-                response = apps.run(command)
-                speak(response)
-
-                if interrupt_requested:
-                    continue
-
-
-        else:
-                status("thinking")
-
-                response = ai_chat.run(command)
-
-                speak(response)
-
-                if interrupt_requested:
-                    continue
-
+ 
 
         
+        # OPEN APP
+        if action == "open_app":
+            
+            success_sound()
+
+            target = result.get("target", "")
+
+            response = app_finder.open_app(target)
+
+            speak(response)
+
+            if interrupt_requested:
+                interrupt_sound()
+                continue
+
+        
+        # SCREENSHOT
+        elif action == "screenshot":
+
+            success_sound()
+
+            response = screenshot.run()
+
+            speak(response)
+            if interrupt_requested:
+                interrupt_sound()
+                continue
+        
+
+        # SEARCH WEB
+        elif action == "search_web":
+
+            query = result.get("query", "")
+
+            success_sound()
+
+            response = search_web.run(query)
+
+            speak(response)
+            if interrupt_requested:
+                interrupt_sound()
+                continue
+            
+
+        # SLEEP
+        elif action == "sleep":
+            sleep_sound()
+
+            speak("Going to sleep")
+
+            status("offline")
+
+            break
+
+
+        # UNKNOWN
+                # UNKNOWN → CHAT FALLBACK
+        else:
+
+            response = chat.run(command)
+
+            print("\n[RESPONSE:]")
+
+            speak(response)
+            if interrupt_requested:
+                interrupt_sound()
+                continue
+                
 
     except WhisperModel.UnknownValueError:
         status("could not understand")
-
+        error_sound()
     except Exception as e:
         print(e)
         break
