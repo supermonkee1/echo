@@ -32,8 +32,10 @@ def run(prompt):
         "http://localhost:11434/api/generate",
         json={
             "model": "phi3",
-            "prompt": f"{SYSTEM_PROMPT}\n\nUser: {prompt}",
-            "stream": False
+            "prompt": f"{SYSTEM_PROMPT}\n\nQuestion: {prompt}\n\nAnswer:",
+            "stream": False,
+            
+
         }
     )
 

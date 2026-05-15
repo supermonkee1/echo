@@ -13,13 +13,12 @@ from scipy.io.wavfile import write
 from faster_whisper import WhisperModel
 model = WhisperModel("base", compute_type="float32")
 
-from commands import ai_chat, screenshot
-from commands import apps
+from commands import screenshot
 from commands import search_web
 from commands import ai_router
 from commands import app_finder
 from commands import chat
-
+from commands import ask_web
 
 wake_listener = sr.Recognizer()
 
@@ -175,20 +174,7 @@ def not_found_sound():
 def error_sound():
 
     winsound.Beep(400, 300)
-
-
-
-    target = target.lower()
-
-    for app_name in apps:
-
-        if target in app_name:
-
-            subprocess.Popen(apps[app_name], shell=True)
-
-            return f"Opening {app_name}"
-
-    return "Application not found"
+   
 
 
 
@@ -255,14 +241,12 @@ while True:
                 continue
         
 
-        # Search web
-        elif action == "search_web":
-
-            query = result.get("query", "")
-
+                # WEB ANSWER
+        elif action == "ask_web":
             success_sound()
+            query = result.get("query", command)
 
-            response = search_web.run(query)
+            response = ask_web.run(query)
 
             speak(response)
             if interrupt_requested:
